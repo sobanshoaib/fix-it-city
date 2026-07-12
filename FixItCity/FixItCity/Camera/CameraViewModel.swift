@@ -13,22 +13,36 @@ import UIKit
 @Observable
 class CameraViewModel {
     var currentFrame: CGImage?
-    var prediction: String = ""
+    var capturedPhoto: CGImage?
     
     private let cameraManager = CameraManager()
-    
-    init() {
+    private var isStreamingStarted = false
+        
+    func startCameraStream() {
+        guard !isStreamingStarted else {
+            return
+        }
+        isStreamingStarted = true
+        
         Task {
             await handleCameraPreviews()
         }
     }
     
     func handleCameraPreviews() async {
-            for await image in cameraManager.previewStream {
-                Task { @MainActor in
-                    currentFrame = image
-                }
-                
+        for await image in cameraManager.previewStream {
+            Task { @MainActor in
+                self.currentFrame = image
             }
         }
+    }
+    
+    func takePhoto() {
+        cameraManager.takePhoto {image in
+            DispatchQueue.main.async {
+                self.capturedPhoto = image
+            }
+        }
+    }
+    
 }

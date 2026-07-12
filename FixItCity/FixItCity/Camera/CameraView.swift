@@ -9,23 +9,45 @@ import SwiftUI
 import CoreImage
 
 struct CameraView: View {
-    @Binding var image: CGImage?
+    @State private var cameraVM = CameraViewModel()
     
     var body: some View {
-        GeometryReader { geometry in
-            if let image = image {
+        ZStack {
+            if let image = cameraVM.currentFrame {
                 Image(decorative: image, scale: 1)
                     .resizable()
-                    .scaledToFit()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .scaledToFill()
+                    .ignoresSafeArea()
             } else {
-                ContentUnavailableView("No Camera Feed.", systemImage: "xmark.circle.fill")
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                Color.black
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                    Text("Loading camera...")
+                        .foregroundColor(.white)
+                        .padding(.top, 20)
+                }
             }
+            VStack {
+                Spacer()
+                Button{
+                    cameraVM.takePhoto()
+                } label: {
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 80, height: 80)
+                }
+                .padding(.bottom, 40)
+            }
+        }
+        .onAppear {
+            cameraVM.startCameraStream()
         }
     }
 }
 
 #Preview {
-    CameraView(image: .constant(nil))
+    CameraView()
 }

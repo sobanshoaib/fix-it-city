@@ -10,6 +10,7 @@ import Foundation
 
 import Foundation
 import AVFoundation
+import UIKit
 
 class CameraManager: NSObject {
     private let captureSession = AVCaptureSession() //does real time campture. director/central hub of camera setupt. connects input to output
@@ -17,6 +18,9 @@ class CameraManager: NSObject {
     private var videoOutput: AVCaptureVideoDataOutput? //what you want to get as output, so in this code it will be a video frame
     private let systemPreferredCamera = AVCaptureDevice.default(for: .video) //the hadware device. device/physical camera that provides streams of media
     private var sessionQueue = DispatchQueue(label: "video.preview.session")
+    
+    private var photoOutput: AVCapturePhotoOutput? //used for capturing photos
+    
     
     //check if app is authorized to use the camera
     private var isAuthorized: Bool {
@@ -32,6 +36,8 @@ class CameraManager: NSObject {
     }
     
     private var addToPreviewStream: ((CGImage) -> Void)?
+    
+    private var photoCaptureCompletion: ((CGImage) -> Void)?
     
     lazy var previewStream: AsyncStream<CGImage> = {
         AsyncStream { continuation in
@@ -68,22 +74,31 @@ class CameraManager: NSObject {
             self.captureSession.commitConfiguration()
         }
         
+        //video output
         let videoOutput = AVCaptureVideoDataOutput()
         self.videoOutput = videoOutput
         videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
         
+        let photoOutput = AVCapturePhotoOutput()
+        self.photoOutput = photoOutput
+        
+        //make sure session supports device input, video output, and photo output
         guard captureSession.canAddInput(deviceInput) else {
-            print("Not able to add device input")
             return
         }
         
         guard captureSession.canAddOutput(videoOutput) else {
-            print("Not able to add video output")
+            return
+        }
+        
+        guard captureSession.canAddOutput(photoOutput) else {
             return
         }
         
         captureSession.addInput(deviceInput)
         captureSession.addOutput(videoOutput)
+        captureSession.addOutput(photoOutput)
+        
         
         if let connection = videoOutput.connection(with: .video), connection.isVideoOrientationSupported {
             connection.videoOrientation = .portrait
@@ -100,14 +115,49 @@ class CameraManager: NSObject {
         
     }
     
+    func takePhoto(completion: @escaping (CGImage) -> Void) {
+        
+        guard let photoOutput else {
+            return
+        }
+        
+        photoCaptureCompletion = completion
+        let settings = AVCapturePhotoSettings()
+        
+        // tells camera to capture one photo
+        photoOutput.capturePhoto(with: settings, delegate: self)
+        
+    }
+    
 }
 
-extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate, AVCapturePhotoCaptureDelegate {
     //camera gives frame (output). recieveing one cmsamplebuffer per frame, which is a chunck of raw video data
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let currentFrame = sampleBuffer.cgImage else {
             return
         }
         addToPreviewStream?(currentFrame)
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: (any Error)?) {
+        
+        guard error == nil else {
+            return
+        }
+        
+        guard let imageData = photo.fileDataRepresentation() else {
+            return
+        }
+        
+        guard let uiImage = UIImage(data: imageData) else {
+            return
+        }
+        
+        guard let cgImage = uiImage.cgImage else {
+            return
+        }
+        
+        photoCaptureCompletion?(cgImage)
     }
 }
