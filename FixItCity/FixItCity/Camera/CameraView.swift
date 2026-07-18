@@ -41,6 +41,29 @@ struct CameraView: View {
                 }
                 .padding(.bottom, 40)
             }
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    
+                    if let thumb = cameraVM.capturedPhoto {
+                        NavigationLink {
+                            PhotoDetailView(image: thumb)
+                        } label: {
+                            Image(decorative: thumb, scale: 1)
+                                .resizable()
+                                .scaledToFit()
+                                .rotationEffect(.degrees(90))
+                                .frame(width: 80, height: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.8), lineWidth: 1))
+                                .shadow(radius: 4)
+                        }
+                        .padding()
+                    }
+                }
+                Spacer()
+            }
         }
         .onAppear {
             cameraVM.startCameraStream()
