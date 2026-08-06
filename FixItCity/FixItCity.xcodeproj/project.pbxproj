@@ -11,6 +11,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		97094F79302436A8007D71FE /* Location */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Location;
+			sourceTree = "<group>";
+		};
 		97F0CE8B2FC274B2006DD50D /* FixItCity */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FixItCity;
@@ -34,6 +39,7 @@
 			children = (
 				97F0CE8B2FC274B2006DD50D /* FixItCity */,
 				97F0CE8A2FC274B2006DD50D /* Products */,
+				97094F79302436A8007D71FE /* Location */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,6 +67,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				97094F79302436A8007D71FE /* Location */,
 				97F0CE8B2FC274B2006DD50D /* FixItCity */,
 			);
 			name = FixItCity;

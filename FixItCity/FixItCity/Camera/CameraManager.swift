@@ -5,6 +5,10 @@
 //  Created by Soban Shoaib on 2026-05-23.
 //
 
+
+//talks to AVFoundation. manages the camera
+
+
 import Foundation
 
 
