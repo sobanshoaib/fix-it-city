@@ -11,49 +11,80 @@ import Observation
 
 @Observable
 class LocationManager: NSObject {
-    
+
     var authorizationStatus: CLAuthorizationStatus
     var currentLocation: CLLocation?
     var currentAddress: String?
     var currentCity: String?
     var errorMessages: String?
-    
+
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
-    
+
     override init() {
         authorizationStatus = .notDetermined
-        
+
         super.init()
-        
+
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        
+
     }
-    
+
     func requestLocationPermission() {
-        
+        locationManager.requestWhenInUseAuthorization()
     }
-    
+
     func requestCurrentLocation() {
-        
+        locationManager.requestLocation()
     }
-    
+
     func reverseGeocode(location: CLLocation) {
-        
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+            guard let self else { return }
+            
+            if let error {
+                self.errorMessages = error.localizedDescription
+                return
+            }
+            
+            guard let placemark = placemarks?.first else {
+                return
+            }
+            
+            self.currentCity = placemark.locality
+            self.currentAddress = [
+                placemark.subThoroughfare,
+                placemark.thoroughfare,
+                placemark.locality,
+                placemark.administrativeArea,
+                placemark.postalCode
+            ]
+                .compactMap{ $0 }
+                .joined(separator: " ")
+        }
     }
 }
 
 extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        
+        self.authorizationStatus = manager.authorizationStatus
+
+        if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
+            return requestCurrentLocation()
+        }
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {
+            return
+        }
         
+        currentLocation = location
+        reverseGeocode(location: location)
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        
+        errorMessages = error.localizedDescription
     }
 }
