@@ -13,9 +13,10 @@ import UIKit
 @Observable
 class CameraViewModel {
     var currentFrame: CGImage?
-    var capturedPhoto: CGImage?
+    var capturedPhoto: CapturedPhoto?
     
     private let cameraManager = CameraManager()
+    private let locationManager = LocationManager()
     private var isStreamingStarted = false
         
     func startCameraStream() {
@@ -23,10 +24,11 @@ class CameraViewModel {
             return
         }
         isStreamingStarted = true
+        locationManager.requestLocationPermission()
         
         Task {
             await handleCameraPreviews()
-        }
+                    }
     }
     
     func handleCameraPreviews() async {
@@ -40,7 +42,12 @@ class CameraViewModel {
     func takePhoto() {
         cameraManager.takePhoto {image in
             DispatchQueue.main.async {
-                self.capturedPhoto = image
+                self.locationManager.requestCurrentLocation {
+                    photoLocation in
+                    DispatchQueue.main.async {
+                        self.capturedPhoto = CapturedPhoto(capturedPhoto: image, location: photoLocation)
+                    }
+                }
             }
         }
     }

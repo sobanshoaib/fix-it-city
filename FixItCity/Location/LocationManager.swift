@@ -20,6 +20,8 @@ class LocationManager: NSObject {
 
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
+    
+    private var locationCompletion: ((PhotoLocationModel?) -> Void)?
 
     override init() {
         authorizationStatus = .notDetermined
@@ -35,7 +37,8 @@ class LocationManager: NSObject {
         locationManager.requestWhenInUseAuthorization()
     }
 
-    func requestCurrentLocation() {
+    func requestCurrentLocation(completion: ((PhotoLocationModel?) -> Void)? = nil) {
+        locationCompletion = completion
         locationManager.requestLocation()
     }
 
@@ -45,10 +48,14 @@ class LocationManager: NSObject {
             
             if let error {
                 self.errorMessages = error.localizedDescription
+                self.locationCompletion?(PhotoLocationModel(location: location.coordinate, address: nil))
+                self.locationCompletion = nil
                 return
             }
             
             guard let placemark = placemarks?.first else {
+                self.locationCompletion?(PhotoLocationModel(location: location.coordinate, address: nil))
+                self.locationCompletion = nil
                 return
             }
             
@@ -62,6 +69,8 @@ class LocationManager: NSObject {
             ]
                 .compactMap{ $0 }
                 .joined(separator: " ")
+            self.locationCompletion?(PhotoLocationModel(location: location.coordinate, address: self.currentAddress))
+            self.locationCompletion = nil
         }
     }
 }
@@ -86,5 +95,7 @@ extension LocationManager: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         errorMessages = error.localizedDescription
+        locationCompletion?(nil)
+        locationCompletion = nil
     }
 }

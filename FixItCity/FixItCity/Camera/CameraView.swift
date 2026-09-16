@@ -46,11 +46,11 @@ struct CameraView: View {
                 HStack {
                     Spacer()
                     
-                    if let thumb = cameraVM.capturedPhoto {
+                    if let captured = cameraVM.capturedPhoto {
                         NavigationLink {
-                            PhotoDetailView(image: thumb)
+                            PhotoDetailView(photo: captured)
                         } label: {
-                            Image(decorative: thumb, scale: 1)
+                            Image(decorative: captured.capturedPhoto, scale: 1)
                                 .resizable()
                                 .scaledToFit()
                                 .rotationEffect(.degrees(90))

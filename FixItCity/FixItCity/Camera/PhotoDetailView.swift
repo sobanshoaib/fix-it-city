@@ -9,21 +9,46 @@ import SwiftUI
 import CoreImage
 
 struct PhotoDetailView: View {
-    let image: CGImage
+    let photo: CapturedPhoto
     
     var body: some View {
-        Image(decorative: image, scale: 1)
-            .resizable()
-            .scaledToFit()
-            .rotationEffect(.degrees(90))
-            .ignoresSafeArea()
-            .background(Color.black)
+        ZStack(alignment: .bottom) {
+            Image(decorative: photo.capturedPhoto, scale: 1)
+                .resizable()
+                .scaledToFit()
+                .rotationEffect(.degrees(90))
+                .ignoresSafeArea()
+                .background(Color.black)
+            
+            if let address = photo.location?.address {
+                Text(address)
+                    .foregroundStyle(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.6))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.bottom, 30)
+            }
+            
+            NavigationLink {
+                FormView()
+            } label: {
+                  Text("Next")
+                      .font(.headline)
+                      .foregroundColor(.green)
+                      .frame(maxWidth: .infinity)
+                      .padding()
+                      .background(Color.white)
+                      .cornerRadius(8)
+            }
+        }
         
     }
 }
 
 #Preview {
     if let cgImage = UIImage(systemName: "photo")?.cgImage {
-        PhotoDetailView(image: cgImage)
+        PhotoDetailView(photo: CapturedPhoto(capturedPhoto: cgImage, location: nil))
     }
 }
+
+
