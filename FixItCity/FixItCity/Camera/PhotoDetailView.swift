@@ -30,7 +30,7 @@ struct PhotoDetailView: View {
             }
             
             NavigationLink {
-                FormView()
+                FormView(photo: photo)
             } label: {
                   Text("Next")
                       .font(.headline)
