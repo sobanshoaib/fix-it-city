@@ -69,7 +69,7 @@ class LocationManager: NSObject {
             ]
                 .compactMap{ $0 }
                 .joined(separator: " ")
-            self.locationCompletion?(PhotoLocationModel(location: location.coordinate, address: self.currentAddress))
+            self.locationCompletion?(PhotoLocationModel(location: location.coordinate, address: self.currentAddress, city: self.currentCity))
             self.locationCompletion = nil
         }
     }

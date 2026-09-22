@@ -12,12 +12,14 @@
 import SwiftUI
 
 struct FormView: View {
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var formVM: FormViewModel
     
     @State private var userName = ""
     @State private var userEmail = ""
     @State private var userPhone = ""
-    
+    @State private var didSubmit = false
+
     init(photo: CapturedPhoto) {
         _formVM = State(initialValue: FormViewModel(photo: photo))
     }
@@ -26,9 +28,22 @@ struct FormView: View {
         TextField("Email", text: $userEmail)
         TextField("Phone", text: $userPhone)
         Text(formVM.photo.location?.address ?? "No address yet")
+        Text(formVM.photo.location?.city ?? "No city yet")
+        if let city = formVM.photo.location?.city {
+            if let email = cityEmails[city] {
+                Text(email)
+            } else {
+                Text("Not found")
+            }
+        }
         
         Button("Submit") {
-            //
+            if formVM.submitReport(context: viewContext, name: userName, email: userEmail, phone: userPhone) {
+                didSubmit = true
+            }
+        }
+        .navigationDestination(isPresented: $didSubmit) {
+            ReportListView()
         }
     }
 }

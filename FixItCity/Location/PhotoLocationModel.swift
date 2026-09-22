@@ -13,6 +13,7 @@ import CoreGraphics
 struct PhotoLocationModel {
     var location: CLLocationCoordinate2D
     var address: String?
+    var city: String?
 }
 
 struct CapturedPhoto {
