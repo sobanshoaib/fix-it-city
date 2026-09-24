@@ -65,6 +65,7 @@ struct CameraView: View {
                 Spacer()
             }
         }
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             cameraVM.startCameraStream()
         }
