@@ -42,6 +42,8 @@ class CameraManager: NSObject {
     private var addToPreviewStream: ((CGImage) -> Void)?
     
     private var photoCaptureCompletion: ((CGImage) -> Void)?
+
+    private var hasLoggedFirstFrame = false
     
     lazy var previewStream: AsyncStream<CGImage> = {
         AsyncStream { continuation in
@@ -62,61 +64,72 @@ class CameraManager: NSObject {
     }
     
     private func configureSession() async {
-        
+        print("[CameraManager] configureSession started")
+
+        let authorized = await isAuthorized
+        print("[CameraManager] isAuthorized = \(authorized)")
+        print("[CameraManager] systemPreferredCamera = \(String(describing: systemPreferredCamera))")
+
         //does 3 checks, checks if user permission is needed, checks device is available, and check if input can be created
-        guard await isAuthorized,
+        guard authorized,
               let systemPreferredCamera,
               let deviceInput = try? AVCaptureDeviceInput(device: systemPreferredCamera)
         else {
+            print("[CameraManager] configureSession bailed on the first guard (authorized/device/input)")
             return
         }
-        
+
         captureSession.beginConfiguration()
-        
+
         //run this when function ends
         defer {
             self.captureSession.commitConfiguration()
+            print("[CameraManager] committed configuration")
         }
-        
+
         //video output
         let videoOutput = AVCaptureVideoDataOutput()
         self.videoOutput = videoOutput
         videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
-        
+
         let photoOutput = AVCapturePhotoOutput()
         self.photoOutput = photoOutput
-        
+
         //make sure session supports device input, video output, and photo output
         guard captureSession.canAddInput(deviceInput) else {
+            print("[CameraManager] canAddInput returned false")
             return
         }
-        
+
         guard captureSession.canAddOutput(videoOutput) else {
+            print("[CameraManager] canAddOutput(videoOutput) returned false")
             return
         }
-        
+
         guard captureSession.canAddOutput(photoOutput) else {
+            print("[CameraManager] canAddOutput(photoOutput) returned false")
             return
         }
-        
+
         captureSession.addInput(deviceInput)
         captureSession.addOutput(videoOutput)
         captureSession.addOutput(photoOutput)
-        
-        
+        print("[CameraManager] input/outputs added")
+
         if let connection = videoOutput.connection(with: .video), connection.isVideoOrientationSupported {
             connection.videoOrientation = .portrait
         }
     }
-    
+
     private func startSession() async {
-        
-        guard await isAuthorized else {
+        let authorized = await isAuthorized
+        print("[CameraManager] startSession isAuthorized = \(authorized)")
+        guard authorized else {
             return
         }
-        
+
         captureSession.startRunning()
-        
+        print("[CameraManager] captureSession.isRunning = \(captureSession.isRunning)")
     }
     
     func takePhoto(completion: @escaping (CGImage) -> Void) {
@@ -139,7 +152,12 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate, AVCapture
     //camera gives frame (output). recieveing one cmsamplebuffer per frame, which is a chunck of raw video data
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let currentFrame = sampleBuffer.cgImage else {
+            print("[CameraManager] sampleBuffer.cgImage was nil")
             return
+        }
+        if !hasLoggedFirstFrame {
+            hasLoggedFirstFrame = true
+            print("[CameraManager] first frame delivered, addToPreviewStream is \(addToPreviewStream == nil ? "nil" : "set")")
         }
         addToPreviewStream?(currentFrame)
     }
