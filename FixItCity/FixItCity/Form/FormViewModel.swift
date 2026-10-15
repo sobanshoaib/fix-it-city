@@ -19,13 +19,14 @@ class FormViewModel {
         self.photo = photo
     }
     
-    func submitReport(context: NSManagedObjectContext, name: String, email: String, phone: String) -> Bool {
+    func submitReport(context: NSManagedObjectContext, name: String, email: String, phone: String, details: String) -> Bool {
         let report = Report(context: context)
         report.name = name
         report.email = email
         report.phone = phone
         report.address = photo.location?.address
         report.city = photo.location?.city
+        report.details = details
         report.dateSubmitted = Date()
 
         do {
