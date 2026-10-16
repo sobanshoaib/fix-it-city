@@ -30,30 +30,7 @@ struct FormView: View {
     init(photo: CapturedPhoto) {
         _formVM = State(initialValue: FormViewModel(photo: photo))
     }
-    //    var body: some View {
-    //        TextField("Name", text: $userName)
-    //        TextField("Email", text: $userEmail)
-    //        TextField("Phone", text: $userPhone)
-    //        Text(formVM.photo.location?.address ?? "No address yet")
-    //        Text(formVM.photo.location?.city ?? "No city yet")
-    //        if let city = formVM.photo.location?.city {
-    //            if let email = cityEmails[city] {
-    //                Text(email)
-    //            } else {
-    //                Text("Not found")
-    //            }
-    //        }
-//            Button("Submit") {
-//                if formVM.submitReport(context: viewContext, name: userName, email: userEmail, phone: userPhone) {
-//                    didSubmit = true
-//                }
-//            }
-//            .navigationDestination(isPresented: $didSubmit) {
-//                ReportListView()
-//            }
-    //    }
-    
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -80,9 +57,9 @@ struct FormView: View {
                     }
                 }
                 
-                Image(systemName: "star.fill")
+                Image(decorative: formVM.photo.capturedPhoto, scale: 1, orientation: .right)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .frame(maxWidth: .infinity)
                     .frame(height: 190)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -91,6 +68,7 @@ struct FormView: View {
                 VStack(spacing: 16) {
                     FormField(label: "Name", placeholder: "Your full name", text: $userName)
                         .textContentType(.name)
+                    
                     FormField(label: "Email", placeholder: "you@example.com", text: $userEmail)
                         .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
@@ -100,6 +78,18 @@ struct FormView: View {
                     FormField(label: "Phone", placeholder: "(000) 000-0000", text: $userPhone)
                         .textContentType(.telephoneNumber)
                         .keyboardType(.phonePad)
+                    
+                    GeneratedField(label: "Address", field: formVM.photo.location?.address ?? "No address yet")
+                    
+                    GeneratedField(label: "City", field: formVM.photo.location?.city ?? "No city yet")
+                    
+                    if let city = formVM.photo.location?.city {
+                        if let email = cityEmails[city] {
+                            GeneratedField(label: "City Email", field: email)
+                        } else {
+                            GeneratedField(label: "City Email", field: "Not found")
+                        }
+                    }
                     
                     FormField(label: "What's wrong?", placeholder: "Describe the problem", text: $details, multiline: true)
                 }
@@ -163,6 +153,28 @@ struct FormField: View {
             }
             .font(.system(size: 16))
             .foregroundStyle(Color.formInk)
+            .padding(.horizontal, 16)
+            .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .stroke(Color.formBorder, lineWidth: 1.5))
+        }
+    }
+}
+
+struct GeneratedField: View {
+    let label: String
+    let field: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text(label)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Color.formInk)
+            
+            Text(field)
+            .font(.system(size: 16))
+            .foregroundStyle(Color.formInk)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
             .padding(.horizontal, 16)
             .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
