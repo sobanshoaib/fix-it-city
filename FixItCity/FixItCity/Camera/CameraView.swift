@@ -18,8 +18,10 @@ struct CameraView: View {
         VStack(spacing: 0) {
             viewfinder
             controls
+            Spacer(minLength: 0)
         }
         .background(Color.camBlack.ignoresSafeArea())
+        .ignoresSafeArea(edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .navigationDestination(isPresented: $showPreview) {
             if let photo = cameraVM.capturedPhoto {
@@ -28,6 +30,7 @@ struct CameraView: View {
                 ProgressView().tint(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.camBlack)
+                    .navigationBarBackButtonHidden(true)
             }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: shutterCount)
@@ -38,7 +41,8 @@ struct CameraView: View {
     
     private var viewfinder: some View {
         camerafeed
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
+            .frame(height: 600)
             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 28, bottomTrailingRadius: 28, style: .continuous))
             .ignoresSafeArea(edges: .top)
     }
@@ -91,7 +95,8 @@ struct CameraView: View {
                 Spacer()
             }
             .padding(.horizontal, 40)
-            .frame(height: 144)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
     }
 }
 
