@@ -47,3 +47,5 @@ amplifyconfiguration.json
 
 # Logs
 *.log
+
+.vscode/
