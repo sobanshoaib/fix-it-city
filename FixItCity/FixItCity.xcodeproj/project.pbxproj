@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		974EDF9A3092D5B5000FA66C /* AWSClientRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 974EDF993092D5B5000FA66C /* AWSClientRuntime */; };
+		974EDF9C3092D5B5000FA66C /* AWSS3 in Frameworks */ = {isa = PBXBuildFile; productRef = 974EDF9B3092D5B5000FA66C /* AWSS3 */; };
+		974EDF9F3092D6D9000FA66C /* AWSSDKIdentity in Frameworks */ = {isa = PBXBuildFile; productRef = 974EDF9E3092D6D9000FA66C /* AWSSDKIdentity */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		97F0CE892FC274B2006DD50D /* FixItCity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FixItCity.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -28,18 +34,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				974EDF9C3092D5B5000FA66C /* AWSS3 in Frameworks */,
+				974EDF9F3092D6D9000FA66C /* AWSSDKIdentity in Frameworks */,
+				974EDF9A3092D5B5000FA66C /* AWSClientRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		974EDF9D3092D6D9000FA66C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		97F0CE802FC274B2006DD50D = {
 			isa = PBXGroup;
 			children = (
 				97F0CE8B2FC274B2006DD50D /* FixItCity */,
 				97F0CE8A2FC274B2006DD50D /* Products */,
 				97094F79302436A8007D71FE /* Location */,
+				974EDF9D3092D6D9000FA66C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -72,6 +89,9 @@
 			);
 			name = FixItCity;
 			packageProductDependencies = (
+				974EDF993092D5B5000FA66C /* AWSClientRuntime */,
+				974EDF9B3092D5B5000FA66C /* AWSS3 */,
+				974EDF9E3092D6D9000FA66C /* AWSSDKIdentity */,
 			);
 			productName = FixItCity;
 			productReference = 97F0CE892FC274B2006DD50D /* FixItCity.app */;
@@ -101,6 +121,9 @@
 			);
 			mainGroup = 97F0CE802FC274B2006DD50D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				974EDF983092D5B5000FA66C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 97F0CE8A2FC274B2006DD50D /* Products */;
 			projectDirPath = "";
@@ -335,6 +358,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		974EDF983092D5B5000FA66C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/awslabs/aws-sdk-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.17;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		974EDF993092D5B5000FA66C /* AWSClientRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 974EDF983092D5B5000FA66C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */;
+			productName = AWSClientRuntime;
+		};
+		974EDF9B3092D5B5000FA66C /* AWSS3 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 974EDF983092D5B5000FA66C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */;
+			productName = AWSS3;
+		};
+		974EDF9E3092D6D9000FA66C /* AWSSDKIdentity */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 974EDF983092D5B5000FA66C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */;
+			productName = AWSSDKIdentity;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 97F0CE812FC274B2006DD50D /* Project object */;
 }

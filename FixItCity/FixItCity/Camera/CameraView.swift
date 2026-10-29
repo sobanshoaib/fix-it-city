@@ -17,6 +17,11 @@ struct CameraView: View {
     var body: some View {
         VStack(spacing: 0) {
             viewfinder
+            Button("Test S3") {
+                Task {
+                    await testS3Connection()
+                }
+            }
             controls
             Spacer(minLength: 0)
         }
