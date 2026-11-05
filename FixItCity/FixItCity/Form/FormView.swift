@@ -95,8 +95,10 @@ struct FormView: View {
                 }
             
             Button {
-                if formVM.submitReport(context: viewContext, name: userName, email: userEmail, phone: userPhone, details: details) {
-                    didSubmit = true
+                Task{
+                    if await formVM.submitReport(context: viewContext, name: userName, email: userEmail, phone: userPhone, details: details) {
+                        didSubmit = true
+                    }
                 }
             } label: {
                 HStack(spacing: 10) {

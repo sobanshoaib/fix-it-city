@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import UIKit
 
 struct ReportListView: View {
     @FetchRequest(
@@ -65,15 +66,24 @@ struct ReportListView: View {
 
 struct ReportRow: View {
     @ObservedObject var report: Report
+    @State private var image: UIImage?
     
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
-            Image(systemName: "mappin.and.ellipse")
-                .font(.system(size: 22, weight: .medium))
-                .foregroundStyle(Color.fixRed)
-                .frame(width: 52, height: 52)
-                .background(Color.fixRed.opacity(0.1),
-                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            Group {
+                if let image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(systemName: "mappin.and.ellipse")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundStyle(Color.fixRed)
+                }
+            }
+            .frame(width: 52, height: 52)
+            .background(Color.fixRed.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(report.address ?? "Unknown location")
@@ -98,6 +108,15 @@ struct ReportRow: View {
         .padding(12)
         .background(.white, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: Color.formInk.opacity(0.05), radius: 1, y: 1)
+        .task {
+            guard let key = report.photoKey else { return }
+            do {
+                let data = try await S3Service.downloadPhoto(key: key)
+                image = UIImage(data: data)
+            } catch {
+                print("Photo download failed: \(error)")
+            }
+        }
     }
     
     private var dateText: String {
